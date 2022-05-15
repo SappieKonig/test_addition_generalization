@@ -5,9 +5,9 @@ import torch.nn.functional as F
 import torch
 import tqdm
 
-dataset = NumberDataset()
+dataset = NumberDataset(use_prompt=True)
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
-eval_dataset = NumberDataset(max_len=11, min_len=11, size=10000)
+eval_dataset = NumberDataset(max_len=11, min_len=11, size=10000, use_prompt=True)
 eval_dataloader = DataLoader(eval_dataset, batch_size=32, shuffle=True)
 model = Model(max_seq_len=dataset.max_seq_len, n_tokens=dataset.n_tokens, dim=128, depth=12, heads=8, dim_head=16,
               mlp_dim=512).to('cuda')
@@ -30,6 +30,7 @@ for epoch in range(10):
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
+
 
         acc = (pred.argmax(dim=2) == x[:, 1:]).float().mean()
         train_acc += acc.item() * len(x)
